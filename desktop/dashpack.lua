@@ -68,9 +68,10 @@ function dashpack.new(args, geometry, style)
 	local function update()
 		for i, sens in ipairs(args.sensors) do
 			local state = sens.meter_function(sens.args)
-			local text_color = sens.crit and state[1] > sens.crit and style.color.main or style.color.gray
+			-- local text_color = sens.crit and state[1] > sens.crit and style.color.main or style.color.gray
+      local text_color = style.color.main
 
-			pack:set_values(state[1] / sens.maxm, i)
+			-- pack:set_values(state[1] / sens.maxm, i)
 			pack:set_label_color(text_color, i)
 
 			if style.show_text then
