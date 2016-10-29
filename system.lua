@@ -326,6 +326,19 @@ function system.thermal.sensors(args)
 	return temp and { tonumber(temp) } or { 0 }
 end
 
+local sensors_store
+
+function system.thermal.sensors_core(args)
+	local args = args or {}
+	local index = args.index or 0
+
+	if args.main then sensors_store = awful.util.pread("sensors | grep Core") end
+	local line = string.match(sensors_store, "Core " .. index .."(.-)\r?\n")
+	local temp = string.match(line, "%+(%d+%.%d)°[CF]")
+
+	return temp and { tonumber(temp) } or { 0 }
+end
+
 -- Using hddtemp
 ------------------------------------------------------------
 function system.thermal.hddtemp(args)
@@ -352,6 +365,20 @@ function system.thermal.nvoptimus()
 
   temp = awful.util.pread("nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader")
 	return { tonumber(temp), off = false } -- TODO: off = false deberia comprobarse la existencia de una tarjeta nvidia
+end
+
+-- Using nvidia-smi on sysmem with optimus (nvidia-prime)
+------------------------------------------------------------
+function system.thermal.nvprime()
+	local temp = 0
+	local nvidia_on = string.find(awful.util.pread("prime-select query"), "nvidia")
+
+	if nvidia_on ~= nil then
+		t = string.match(awful.util.pread("nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader"), "%d%d")
+		if t then temp = t end
+	end
+
+	return { tonumber(temp), off = nvidia_on == nil }
 end
 
 -- Get info from transmission-remote client
